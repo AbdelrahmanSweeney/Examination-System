@@ -1,10 +1,8 @@
-Alter PROC Exam_Random_generation  @cr_name VARCHAR(20), @no_TF INT, @no_ML INT
+Alter PROC Exam_Random_generation  @cr_name VARCHAR(20), @no_TF INT, @no_ML INT, @exam_time int, @exam_gread int
 AS
 begin
-	DECLARE @minute_question INT =2
-	DECLARE @gread_question INT =5
 	INSERT INTO Exam(exam_grade, exam_time, cr_id)
-	VALUES     ((@no_TF+@no_ML)*@gread_question, (@no_TF+@no_ML)*@minute_question,
+	VALUES     (@exam_gread, @exam_time,
 			   (SELECT cr_id FROM course WHERE cr_name = @cr_name))
 
 DECLARE @ex_id INT
@@ -30,5 +28,5 @@ SELECT  Q.question, mcq.choices  --Return Exam Question
 
 end
 
-Execute Exam_Random_generation @cr_name='Programming', @no_TF=3, @no_ML=1
+Execute Exam_Random_generation @cr_name='Programming', @no_TF=2, @no_ML=1 ,@exam_time=60 ,@exam_gread=20
 

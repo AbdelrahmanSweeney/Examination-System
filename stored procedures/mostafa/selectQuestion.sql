@@ -1,11 +1,12 @@
 /*INSERT QUESTION TABLE  */
-ALTER PROCEDURE 
-	SelectQuestion 
+alter PROCEDURE 
+	p_select_question 
 		@ques_id_value int = NULL,
 		@q_value nvarchar(200) = NULL ,
 		@q_answer_value varchar(200) = NULL,
 		@q_grade_value float = NULL,
 		@q_type_value nvarchar(50) = NULL,
+		@top int = NULL,
 
 		@ques_id_condition int = NULL,
 		@q_condition nvarchar(200) = NULL ,
@@ -15,6 +16,9 @@ ALTER PROCEDURE
 AS
 	DECLARE @SelectStatment nvarchar(300)		
 		SET @SelectStatment = 'SELECT '
+
+	IF dbo.[IsNullOrEmpty](@top) = 0
+		SET @SelectStatment = CONCAT(@SelectStatment, 'top(@top) ')
 
 	IF dbo.[IsNullOrEmpty](@q_value) = 0
 		SET @SelectStatment = CONCAT(@SelectStatment, 'question ,')
@@ -27,7 +31,7 @@ AS
 	IF dbo.[IsNullOrEmpty](@q_answer_value) = 0
 		SET @SelectStatment = CONCAT(@SelectStatment, ' qAnswer ,')
 
-	IF @SelectStatment = 'SELECT '
+	IF @SelectStatment = 'SELECT top(@top) ' or @SelectStatment = 'SELECT '
 		SET @SelectStatment = CONCAT(@SelectStatment, ' * ')
 	ELSE
 		SET @SelectStatment  = SUBSTRING(@SelectStatment, 1, (len(@SelectStatment) -1))
@@ -53,13 +57,14 @@ AS
 	ELSE
 		SET @SelectStatment  = SUBSTRING(@SelectStatment, 1, (len(@SelectStatment) -3))/*remove and*/
 
-	SELECT @SelectStatment
-			 /**EXECUTE sp_executesql @SelectStatment,
+	
+	EXECUTE sp_executesql @SelectStatment,
 				N'@ques_id_value int,
 				@q_value nvarchar(200) ,
 				@q_answer_value varchar(200),
 				@q_grade_value float,
 				@q_type_value nvarchar(50),
+				@top int,
 
 				@ques_id_condition int,
 				@q_condition nvarchar(200),
@@ -71,14 +76,15 @@ AS
 				@q_answer_value,
 				@q_grade_value,
 				@q_type_value,
+				@top,
 
 				@ques_id_condition,
 				@q_condition,
 				@q_answer_condition,
 				@q_grade_condition,
-				@q_type_condition*/
+				@q_type_condition
 
 RETURN 
  
 
- exec SelectQuestion  @q_type_condition = 'GG'
+ exec p_select_question  @top=5
